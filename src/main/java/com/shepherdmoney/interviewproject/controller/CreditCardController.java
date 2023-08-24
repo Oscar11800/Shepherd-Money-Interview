@@ -3,6 +3,7 @@ package com.shepherdmoney.interviewproject.controller;
 import com.shepherdmoney.interviewproject.model.CreditCard;
 import com.shepherdmoney.interviewproject.model.User;
 import com.shepherdmoney.interviewproject.repository.CreditCardRepository;
+import com.shepherdmoney.interviewproject.service.CreditCardService;
 import com.shepherdmoney.interviewproject.vo.request.AddCreditCardToUserPayload;
 import com.shepherdmoney.interviewproject.vo.request.UpdateBalancePayload;
 import com.shepherdmoney.interviewproject.vo.response.CreditCardView;
@@ -21,8 +22,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class CreditCardController {
 
     // TODO: wire in CreditCard repository here (~1 line)
-    @Autowired
-    CreditCardRepository creditCardRepo;
+    final CreditCardService creditCardService;
+
+    public CreditCardController(CreditCardService creditCardService) {
+        this.creditCardService = creditCardService;
+    }
+
     @PostMapping("/credit-card")
     public ResponseEntity<Integer> addCreditCardToUser(@RequestBody AddCreditCardToUserPayload payload) {
         // TODO: Create a credit card entity, and then associate that credit card with user with given userId
@@ -36,8 +41,7 @@ public class CreditCardController {
     public ResponseEntity<List<CreditCardView>> getAllCardOfUser(@RequestParam int userId) {
         // TODO: return a list of all credit card associated with the given userId, using CreditCardView class
         //       if the user has no credit card, return empty list, never return null
-        List<CreditCard> creditCardList = creditCardRepo.findAll();
-
+        return null;
     }
 
     @GetMapping("/credit-card:user-id")
