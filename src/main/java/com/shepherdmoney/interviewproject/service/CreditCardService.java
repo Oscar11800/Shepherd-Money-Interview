@@ -1,12 +1,11 @@
 package com.shepherdmoney.interviewproject.service;
 
-import com.shepherdmoney.interviewproject.exceptions.CreditCardNotFoundException;
-import com.shepherdmoney.interviewproject.exceptions.UserNotFoundException;
+import com.shepherdmoney.interviewproject.exception.CreditCardNotFoundException;
+import com.shepherdmoney.interviewproject.exception.UserNotFoundException;
 import com.shepherdmoney.interviewproject.model.CreditCard;
 import com.shepherdmoney.interviewproject.model.User;
 import com.shepherdmoney.interviewproject.repository.CreditCardRepository;
 import com.shepherdmoney.interviewproject.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 

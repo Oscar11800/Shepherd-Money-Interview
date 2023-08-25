@@ -1,6 +1,7 @@
 package com.shepherdmoney.interviewproject.service;
 
-import com.shepherdmoney.interviewproject.exceptions.CreditCardNotFoundException;
+import com.shepherdmoney.interviewproject.exception.CreditCardNotFoundException;
+import com.shepherdmoney.interviewproject.exception.UserNotFoundException;
 import com.shepherdmoney.interviewproject.model.CreditCard;
 import com.shepherdmoney.interviewproject.model.User;
 import com.shepherdmoney.interviewproject.repository.UserRepository;
@@ -39,7 +40,11 @@ public class UserService {
     }
 
     public void deleteUser(int id){
-        userRepo.deleteById(id);
+        Optional<User> user = userRepo.findById(id);
+        if(user.isEmpty()){
+            throw new UserNotFoundException("User with id{ " + id + " } is not found.");
+        }
+        userRepo.delete(user.get());
     }
 
 }

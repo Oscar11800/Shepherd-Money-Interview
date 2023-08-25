@@ -1,20 +1,16 @@
 package com.shepherdmoney.interviewproject.controller;
 
-import com.shepherdmoney.interviewproject.exceptions.UserNotFoundException;
+import com.shepherdmoney.interviewproject.exception.UserNotFoundException;
 import com.shepherdmoney.interviewproject.model.CreditCard;
-import com.shepherdmoney.interviewproject.model.User;
-import com.shepherdmoney.interviewproject.repository.CreditCardRepository;
 import com.shepherdmoney.interviewproject.service.CreditCardService;
 import com.shepherdmoney.interviewproject.utils.ResponseWrapper;
 import com.shepherdmoney.interviewproject.vo.request.AddCreditCardToUserPayload;
 import com.shepherdmoney.interviewproject.vo.request.UpdateBalancePayload;
 import com.shepherdmoney.interviewproject.vo.response.CreditCardView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

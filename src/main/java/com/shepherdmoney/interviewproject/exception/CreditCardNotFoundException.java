@@ -1,4 +1,4 @@
-package com.shepherdmoney.interviewproject.exceptions;
+package com.shepherdmoney.interviewproject.exception;
 
 /**
  * Custom exception class to represent the scenario when a credit card is not found.

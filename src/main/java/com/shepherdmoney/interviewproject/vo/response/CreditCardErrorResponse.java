@@ -1,9 +1,11 @@
-package com.shepherdmoney.interviewproject.exceptions;
+package com.shepherdmoney.interviewproject.vo.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
 
 import java.time.ZonedDateTime;
 
+@Getter
 public class CreditCardErrorResponse {
     @JsonFormat
     private ZonedDateTime timeStamp;
@@ -14,6 +16,22 @@ public class CreditCardErrorResponse {
         this.timeStamp = timeStamp;
         this.statusCode = statusCode;
         this.path = path;
+        this.message = message;
+    }
+
+    public void setTimeStamp(ZonedDateTime timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public void setMessage(String message) {
         this.message = message;
     }
 }
