@@ -24,14 +24,18 @@ public class CreditCard {
 
     private String number;
 
-    @ManyToOne
-    private User owner;
+    //    exclude REMOVE cascade because if card is deleted, associated
+    //    user should not be deleted
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @OneToMany(mappedBy = "creditCard")
     private List<BalanceHistory> balanceHistory = new ArrayList<>();
 
 
-    // TODO: Credit card's owner. For detailed hint, please see User class
+    // TODO: Credit card's owner. For detailed hint, please see User class DONE
 
     // TODO: Credit card's balance history. It is a requirement that the dates in the balanceHistory 
     //       list must be in chronological order, with the most recent date appearing first in the list. 

@@ -28,14 +28,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 * to access credit cards given a user id, and a user given
 * a credit card number.
 *
-* - Every credit card must be associated with a  user, and when we
+* - Every credit card must be associated with a user, and when we
 * delete a user, the associated credit cards should be deleted but
 * not vice versa
 * */
 @RestController
 public class CreditCardController {
 
-    // TODO: wire in CreditCard repository here (~1 line)
+    // TODO: wire in CreditCard repository here (~1 line) DONE
     final CreditCardService creditCardService;
 
     public CreditCardController(CreditCardService creditCardService) {

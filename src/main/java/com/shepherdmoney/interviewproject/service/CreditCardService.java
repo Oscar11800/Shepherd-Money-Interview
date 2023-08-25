@@ -1,8 +1,11 @@
 package com.shepherdmoney.interviewproject.service;
 
 import com.shepherdmoney.interviewproject.exceptions.CreditCardNotFoundException;
+import com.shepherdmoney.interviewproject.exceptions.UserNotFoundException;
 import com.shepherdmoney.interviewproject.model.CreditCard;
+import com.shepherdmoney.interviewproject.model.User;
 import com.shepherdmoney.interviewproject.repository.CreditCardRepository;
+import com.shepherdmoney.interviewproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -20,19 +23,21 @@ import java.util.Optional;
 @Service
 public class CreditCardService {
 
-    final CreditCardRepository creditCardRepo;
+    private final CreditCardRepository creditCardRepo;
+    private final UserRepository userRepository;
 
-    public CreditCardService(CreditCardRepository creditCardRepo) {
+    public CreditCardService(CreditCardRepository creditCardRepo, UserRepository userRepository) {
         this.creditCardRepo = creditCardRepo;
+        this.userRepository = userRepository;
     }
 
     public CreditCard getCreditCard(int id) {
-        Optional<CreditCard> tempCreditCard = creditCardRepo.findById(id);
-        if (tempCreditCard.isEmpty()) {
+        Optional<CreditCard> creditCard = creditCardRepo.findById(id);
+        if (creditCard.isEmpty()) {
             throw new CreditCardNotFoundException("Credit Card with id{" + id + "} not found.");
         }
 
-        return tempCreditCard.get();
+        return creditCard.get();
     }
 
     public List<CreditCard> getAllCreditCards() {
@@ -49,6 +54,14 @@ public class CreditCardService {
             throw new CreditCardNotFoundException("Credit Card with id{" + id + "} not found.");
         }
         creditCard.setId(id);
+        return creditCardRepo.save(creditCard);
+    }
+
+    public CreditCard addCreditCardToUser(int userId, CreditCard creditCard) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found."));
+
+        creditCard.setUser(user);
         return creditCardRepo.save(creditCard);
     }
 
