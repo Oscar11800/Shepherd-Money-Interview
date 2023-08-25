@@ -7,8 +7,8 @@ import java.time.ZonedDateTime;
 
 /*
  * Note: while these detailed error responses are informative and helpful
- * for development, it may not be feasible for production and may
- * be a security concern when users receive it.
+ * for development, it may not be feasible for a smaller scale project
+ * like this example because it adds complexity.
  * */
 @Getter
 public class UserErrorResponse {

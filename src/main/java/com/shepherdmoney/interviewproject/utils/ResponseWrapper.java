@@ -13,23 +13,12 @@ public class ResponseWrapper {
     private Integer id;
     private String message;
 
-    public ResponseWrapper(Integer id) {
-        this.id = id;
-    }
-
     public ResponseWrapper(String message) {
         this.message = message;
-    }
-
-    public ResponseWrapper() {
-
     }
 
     public void setId(Integer id) {
         this.id = id;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

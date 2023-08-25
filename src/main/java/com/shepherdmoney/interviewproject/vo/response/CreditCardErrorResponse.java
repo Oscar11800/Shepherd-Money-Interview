@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.time.ZonedDateTime;
 
+
 @Getter
 public class CreditCardErrorResponse {
     @JsonFormat
@@ -13,6 +14,14 @@ public class CreditCardErrorResponse {
     private String path;
     private String message;
 
+    /**
+     * Custom error response class to provide structured and consistent error messages
+     * for debugging purposes
+     * @param timeStamp The timestamp when the error occurred.
+     * @param statusCode The HTTP status code indicating the error.
+     * @param path The URL path where the error occurred.
+     * @param message The error message describing the issue.
+     */
     public CreditCardErrorResponse(ZonedDateTime timeStamp, int statusCode, String path, String message) {
         this.timeStamp = timeStamp;
         this.statusCode = statusCode;

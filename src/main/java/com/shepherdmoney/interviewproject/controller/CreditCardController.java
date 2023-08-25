@@ -11,11 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-/*
+/**
  * Assumptions about the relationship between credit card and user:
  *  - They have a one-to-many relationship because one user
  * can have more than one credit card, but a credit card cannot have more
@@ -30,36 +26,35 @@ import org.springframework.web.bind.annotation.RequestBody;
  * delete a user, the associated credit cards should be deleted but
  * not vice versa
  * */
+
 @RestController
 public class CreditCardController {
-    final CreditCardService creditCardService;
+
+    private final CreditCardService creditCardService;
 
     public CreditCardController(CreditCardService creditCardService) {
         this.creditCardService = creditCardService;
     }
 
-    /*
-     * Given a credit card payload, create a new credit card and assign it to a user
+    /**
+     * Endpoint to add a new credit card and associate it with a user.
      */
     @PostMapping("/credit-card")
     public ResponseEntity<ResponseWrapper> addCreditCardToUser(@RequestBody AddCreditCardToUserPayload payload) {
-        //create credit card entity
         CreditCard newCreditCard = new CreditCard();
         newCreditCard.setIssuanceBank(payload.getCardIssuanceBank());
         newCreditCard.setNumber(payload.getCardNumber());
 
-        //associate card with user
         CreditCard createdCreditCard = creditCardService.addCreditCardToUser(payload.getUserId(), newCreditCard);
         ResponseWrapper response = new ResponseWrapper("Credit card with number: " + createdCreditCard.getNumber()
-        + " successfully added to user with id: " + payload.getUserId());
-
+                + " successfully added to user with id: " + payload.getUserId());
         response.setId(createdCreditCard.getId());
+
         return ResponseEntity.ok(response);
     }
 
-    /*
-     * Given a userId, returns all credit cards the user owns
-     * ex: http://localhost:8080/credit-card:all?userId=652 to find user 652's credit cards
+    /**
+     * Endpoint to retrieve all credit cards owned by a user.
      */
     @GetMapping("/credit-card:all")
     public ResponseEntity<List<CreditCardView>> getAllCardOfUser(@RequestParam int userId) {
@@ -67,18 +62,16 @@ public class CreditCardController {
         return ResponseEntity.ok(creditCardViews);
     }
 
-    /*
-    * Given a credit card number, return's user id associated with card
-    * ex: http://localhost:8080/credit-card:user-id?creditCardNumber=1 to find user owning
-    * credit card with number 1
-    */
+    /**
+     * Endpoint to retrieve the user ID associated with a credit card number.
+     */
     @GetMapping("/credit-card:user-id")
     public ResponseEntity<Integer> getUserIdForCreditCard(@RequestParam String creditCardNumber) {
         User associatedUser = creditCardService.getUserByCreditCardNumber(creditCardNumber);
         return ResponseEntity.ok(associatedUser.getId());
     }
 
-    /*
+    /**
      * I changed this to a PatchMapping because only one field needs to be updated.
      * By partially updating instead of replacing the entire record
      * it can positively improve performance. Orphan removal has been set to true
@@ -87,9 +80,12 @@ public class CreditCardController {
     @PatchMapping("/credit-card:update-balance-history")
     public ResponseEntity<String> updateBalanceHistory(@RequestBody List<UpdateBalancePayload> payload) {
         creditCardService.updateCreditCardBalances(payload);
-        return ResponseEntity.ok(("Transactions successfully processed"));
+        return ResponseEntity.ok("Transactions successfully processed");
     }
 
+    /**
+     * Endpoint to retrieve credit card details by card number.
+     */
     @GetMapping("/credit-card/{cardNumber}")
     public ResponseEntity<CreditCard> getCreditCard(@PathVariable String cardNumber) {
         return ResponseEntity.ok(creditCardService.getCreditCardByNumber(cardNumber));

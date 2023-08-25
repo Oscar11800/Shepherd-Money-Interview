@@ -31,6 +31,7 @@ public class CreditCardService {
         this.userService = userService;
     }
 
+    // Retrieves a list of CreditCardView objects associated with a user.
     public List<CreditCardView> getAllCreditCardsByUserId(int userId) {
         User user = userService.getUser(userId);
         List<CreditCard> creditCards = user.getCreditCards();
@@ -46,6 +47,7 @@ public class CreditCardService {
         return creditCardViews;
     }
 
+    // Retrieves a CreditCard by its number.
     public CreditCard getCreditCardByNumber(String creditCardNumber) {
         CreditCard creditCard = creditCardRepo.findCreditCardByNumber(creditCardNumber);
         if (creditCard == null) {
@@ -54,6 +56,7 @@ public class CreditCardService {
         return creditCard;
     }
 
+    // Retrieves a User associated with a credit card number.
     public User getUserByCreditCardNumber(String creditCardNumber) {
         CreditCard creditCard = getCreditCardByNumber(creditCardNumber);
         Optional<User> userOptional = Optional.ofNullable(creditCard).map(CreditCard::getUser);
@@ -61,8 +64,9 @@ public class CreditCardService {
         return userOptional.orElseThrow(() -> new UserNotFoundException("No user associated with credit card number " + creditCardNumber));
     }
 
+    // Adds a new credit card to a user.
     public CreditCard addCreditCardToUser(int userId, CreditCard creditCard) {
-        //exception checking done in userService
+        // Exception checking done in userService
         User user = userService.getUser(userId);
         creditCard.setUser(user);
         return creditCardRepo.save(creditCard);
@@ -71,43 +75,48 @@ public class CreditCardService {
     /*
      * Partial credit card update for when we don't want to
      * replace all fields. This can improve performance
-     * when updating entire entity is unnecessary
+     * when updating the entire entity is unnecessary.
      * Assumptions: transactions are not retroactive
      * (not taking effect from the past), there can be
      * multiple transactions on a single date, and therefore
      * multiple balance histories can share a date.
      *
      * Takes in a list of transactions and updates the
-     * respective credit cards' balances
+     * respective credit cards' balances.
      */
     public void updateCreditCardBalances(List<UpdateBalancePayload> transactions) {
         for (UpdateBalancePayload transaction : transactions) {
-            //identify which credit card to transact from
+            // Identify which credit card to transact from.
             String creditCardNumber = transaction.getCreditCardNumber();
             CreditCard creditCard = creditCardRepo.findCreditCardByNumber(creditCardNumber);
 
-            //if unused card, no previous balance, else use latest balance
+            // If unused card, no previous balance; else, use the latest balance.
             if (creditCard != null) {
-                boolean unusedCard = creditCard.getBalanceHistoryList().isEmpty();
-                double currentBalance = 0;
-                if(!unusedCard){
-                    currentBalance = creditCard.getBalanceHistoryList().get(0).getBalance();
-                }
+                BalanceHistory balanceHistory = getBalanceHistory(transaction, creditCard);
 
-                //add transaction as a balance history
-                BalanceHistory balanceHistory = new BalanceHistory();
-                balanceHistory.setDate(transaction.getTransactionTime());
-                //obtain new balance after transaction
-                double newBalance = currentBalance
-                        + transaction.getTransactionAmount();
-                balanceHistory.setBalance(newBalance);
-                //update balance history with new transaction
+                // Update balance history with the new transaction.
                 creditCard.addBalanceHistoryEntry(balanceHistory);
                 creditCardRepo.save(creditCard);
+                System.out.println(creditCard.getBalanceHistoryList());
             } else {
-                throw new CreditCardNotFoundException(
-                        "Credit Card with number{" + creditCardNumber + "} not found.");
+                throw new CreditCardNotFoundException("Credit Card with number " + creditCardNumber + " not found.");
             }
         }
+    }
+
+    // Helper method to obtain latest balance for a new transaction
+    private BalanceHistory getBalanceHistory(UpdateBalancePayload transaction, CreditCard creditCard) {
+        // Check if the card has any previous balance history (using ordered balance history)
+        boolean unusedCard = creditCard.getBalanceHistoryList().isEmpty();
+        double currentBalance = unusedCard ? 0 : creditCard.getSortedBalanceHistoryByDate().get(0).getBalance();
+        System.out.println(currentBalance);
+
+        // Add transaction as a new balance history.
+        BalanceHistory balanceHistory = new BalanceHistory();
+        balanceHistory.setDate(transaction.getTransactionTime());
+        // Calculate the new balance after the transaction.
+        double newBalance = currentBalance + transaction.getTransactionAmount();
+        balanceHistory.setBalance(newBalance);
+        return balanceHistory;
     }
 }
