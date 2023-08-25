@@ -29,12 +29,6 @@ public class UserService {
         return user.get();
     }
 
-    public User assignCreditCard(int id, CreditCard creditCard) {
-        User user = getUser(id);
-        user.addCreditCard(creditCard);
-        return userRepo.save(user);
-    }
-
     public User createUser(User user) {
         return userRepo.save(user);
     }

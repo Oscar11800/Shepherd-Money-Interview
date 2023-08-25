@@ -25,18 +25,10 @@ public class CreditCardService {
     private final CreditCardRepository creditCardRepo;
     private final UserService userService;
 
-    public CreditCardService(CreditCardRepository creditCardRepo, UserService userService) {
+    public CreditCardService(CreditCardRepository creditCardRepo,
+                             UserService userService) {
         this.creditCardRepo = creditCardRepo;
         this.userService = userService;
-    }
-
-    public CreditCard getCreditCard(int id) {
-        Optional<CreditCard> creditCard = creditCardRepo.findById(id);
-        if (creditCard.isEmpty()) {
-            throw new CreditCardNotFoundException("Credit Card with id{" + id + "} not found.");
-        }
-
-        return creditCard.get();
     }
 
     public List<CreditCardView> getAllCreditCardsByUserId(int userId) {
@@ -55,11 +47,11 @@ public class CreditCardService {
     }
 
     public CreditCard getCreditCardByNumber(String creditCardNumber) {
-        try {
-            return creditCardRepo.findCreditCardByNumber(creditCardNumber);
-        } catch (Exception ex) {
+        CreditCard creditCard = creditCardRepo.findCreditCardByNumber(creditCardNumber);
+        if (creditCard == null) {
             throw new CreditCardNotFoundException("Credit card with number " + creditCardNumber + " not found.");
         }
+        return creditCard;
     }
 
     public User getUserByCreditCardNumber(String creditCardNumber) {
@@ -70,6 +62,7 @@ public class CreditCardService {
     }
 
     public CreditCard addCreditCardToUser(int userId, CreditCard creditCard) {
+        //exception checking done in userService
         User user = userService.getUser(userId);
         creditCard.setUser(user);
         return creditCardRepo.save(creditCard);
@@ -79,17 +72,37 @@ public class CreditCardService {
      * Partial credit card update for when we don't want to
      * replace all fields. This can improve performance
      * when updating entire entity is unnecessary
+     * Assumptions: transactions are not retroactive
+     * (not taking effect from the past), there can be
+     * multiple transactions on a single date, and therefore
+     * multiple balance histories can share a date.
+     *
+     * Takes in a list of transactions and updates the
+     * respective credit cards' balances
      */
-    public void updateCreditCardBalances(List<UpdateBalancePayload> balanceUpdates) {
-        for (UpdateBalancePayload updatePayload : balanceUpdates) {
-            String creditCardNumber = updatePayload.getCreditCardNumber();
+    public void updateCreditCardBalances(List<UpdateBalancePayload> transactions) {
+        for (UpdateBalancePayload transaction : transactions) {
+            //identify which credit card to transact from
+            String creditCardNumber = transaction.getCreditCardNumber();
             CreditCard creditCard = creditCardRepo.findCreditCardByNumber(creditCardNumber);
 
+            //if unused card, no previous balance, else use latest balance
             if (creditCard != null) {
+                boolean unusedCard = creditCard.getBalanceHistoryList().isEmpty();
+                double currentBalance = 0;
+                if(!unusedCard){
+                    currentBalance = creditCard.getBalanceHistoryList().get(0).getBalance();
+                }
+
+                //add transaction as a balance history
                 BalanceHistory balanceHistory = new BalanceHistory();
-                balanceHistory.setDate(updatePayload.getTransactionTime());
-                balanceHistory.setBalance(updatePayload.getTransactionAmount());
-                creditCard.getBalanceHistory().add(balanceHistory);
+                balanceHistory.setDate(transaction.getTransactionTime());
+                //obtain new balance after transaction
+                double newBalance = currentBalance
+                        + transaction.getTransactionAmount();
+                balanceHistory.setBalance(newBalance);
+                //update balance history with new transaction
+                creditCard.addBalanceHistoryEntry(balanceHistory);
                 creditCardRepo.save(creditCard);
             } else {
                 throw new CreditCardNotFoundException(

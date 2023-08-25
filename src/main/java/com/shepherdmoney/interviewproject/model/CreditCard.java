@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -37,25 +37,36 @@ public class CreditCard {
 
     @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name="creditcard_id")
-    private List<BalanceHistory> balanceHistory = new ArrayList<>();
+    private List<BalanceHistory> balanceHistoryList = new ArrayList<>();
 
+    /*
+    * Sort balance history by date from latest to oldest
+    */
     public void sortBalanceHistoryByDate(){
-        Collections.sort(balanceHistory, Comparator.comparing(BalanceHistory::getDate).reversed());
-    }
-    public void addBalanceHistoryEntry(BalanceHistory entry){
-        balanceHistory.add(entry);
-        sortBalanceHistoryByDate();
-    }
-    public void updateBalanceHistory(List<UpdateBalancePayload> updates) {
-        for (UpdateBalancePayload update : updates) {
-            BalanceHistory newEntry = new BalanceHistory();
-            newEntry.setDate(update.getTransactionTime());
-            newEntry.setBalance(update.getTransactionAmount());
-            addBalanceHistoryEntry(newEntry);
+        if(!balanceHistoryList.isEmpty()){
+            balanceHistoryList.sort(Comparator.comparing(BalanceHistory::getDate).reversed());
         }
     }
+    public void addBalanceHistoryEntry(BalanceHistory entry){
+        balanceHistoryList.add(entry);
+        sortBalanceHistoryByDate();
+    }
 
-    // TODO: Credit card's owner. For detailed hint, please see User class DONE
+    public void addCurrentBalance(){
+        Instant now = Instant.now();
+        sortBalanceHistoryByDate();
+        BalanceHistory currentBalance = new BalanceHistory();
+        currentBalance.setDate(now);
+        //If no transactions, balance is 0
+        if(balanceHistoryList.isEmpty()){
+            currentBalance.setBalance(0);
+        }
+        else{
+            //set current balance to latest balance
+            currentBalance.setBalance(balanceHistoryList.get(0).getBalance());
+        }
+        balanceHistoryList.add(currentBalance);
+    }
 
     // TODO: Credit card's balance history. It is a requirement that the dates in the balanceHistory 
     //       list must be in chronological order, with the most recent date appearing first in the list. 

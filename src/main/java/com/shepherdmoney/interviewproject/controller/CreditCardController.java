@@ -7,7 +7,6 @@ import com.shepherdmoney.interviewproject.utils.ResponseWrapper;
 import com.shepherdmoney.interviewproject.vo.request.AddCreditCardToUserPayload;
 import com.shepherdmoney.interviewproject.vo.request.UpdateBalancePayload;
 import com.shepherdmoney.interviewproject.vo.response.CreditCardView;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,27 +50,30 @@ public class CreditCardController {
 
         //associate card with user
         CreditCard createdCreditCard = creditCardService.addCreditCardToUser(payload.getUserId(), newCreditCard);
-        ResponseWrapper response = new ResponseWrapper();
+        ResponseWrapper response = new ResponseWrapper("Credit card with number: " + createdCreditCard.getNumber()
+        + " successfully added to user with id: " + payload.getUserId());
 
         response.setId(createdCreditCard.getId());
-
         return ResponseEntity.ok(response);
     }
 
     /*
-    * Given a userId, returns all credit cards the user owns
-    */
+     * Given a userId, returns all credit cards the user owns
+     * ex: http://localhost:8080/credit-card:all?userId=652 to find user 652's credit cards
+     */
     @GetMapping("/credit-card:all")
     public ResponseEntity<List<CreditCardView>> getAllCardOfUser(@RequestParam int userId) {
         List<CreditCardView> creditCardViews = creditCardService.getAllCreditCardsByUserId(userId);
         return ResponseEntity.ok(creditCardViews);
     }
 
+    /*
+    * Given a credit card number, return's user id associated with card
+    * ex: http://localhost:8080/credit-card:user-id?creditCardNumber=1 to find user owning
+    * credit card with number 1
+    */
     @GetMapping("/credit-card:user-id")
     public ResponseEntity<Integer> getUserIdForCreditCard(@RequestParam String creditCardNumber) {
-        // TODO: Given a credit card number, efficiently find whether there is a user associated with the credit card DONE
-        //       If so, return the user id in a 200 OK response. If no such user exists, return 400 Bad Request
-
         User associatedUser = creditCardService.getUserByCreditCardNumber(creditCardNumber);
         return ResponseEntity.ok(associatedUser.getId());
     }
@@ -82,21 +84,14 @@ public class CreditCardController {
      * it can positively improve performance. Orphan removal has been set to true
      * so credit cards cannot exist without an associated user
      */
-    @PatchMapping("/credit-card:update-balance")
-    public ResponseEntity<Integer> postMethodName(@RequestBody List<UpdateBalancePayload> payload) {
-        //TODO: Given a list of transactions, update credit cards' balance history.
-        //      For example: if today is 4/12, a credit card's balanceHistory is [{date: 4/12, balance: 110}, {date: 4/10, balance: 100}],
-        //      Given a transaction of {date: 4/10, amount: 10}, the new balanceHistory is
-        //      [{date: 4/12, balance: 120}, {date: 4/11, balance: 110}, {date: 4/10, balance: 110}]
-        //      Return 200 OK if update is done and successful, 400 Bad Request if the given card number
-        //        is not associated with a card.
-
+    @PatchMapping("/credit-card:update-balance-history")
+    public ResponseEntity<String> updateBalanceHistory(@RequestBody List<UpdateBalancePayload> payload) {
         creditCardService.updateCreditCardBalances(payload);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(("Transactions successfully processed"));
     }
 
     @GetMapping("/credit-card/{cardNumber}")
-    public ResponseEntity<CreditCard> getCreditCard(@PathVariable String cardNumber){
-        return new ResponseEntity<>(creditCardService.getCreditCardByNumber(cardNumber), HttpStatus.OK);
+    public ResponseEntity<CreditCard> getCreditCard(@PathVariable String cardNumber) {
+        return ResponseEntity.ok(creditCardService.getCreditCardByNumber(cardNumber));
     }
 }

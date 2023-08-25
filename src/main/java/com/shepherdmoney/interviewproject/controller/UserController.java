@@ -37,12 +37,12 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
         //service layer tries and catches exception
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("User with id: " + id + " deleted.");
     }
 
     @GetMapping("/user/{id}")
     public ResponseEntity<User> getUser(@PathVariable int id) {
         userService.getUser(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.getUser(id));
     }
 }
