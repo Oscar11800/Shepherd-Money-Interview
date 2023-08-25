@@ -1,5 +1,6 @@
 package com.shepherdmoney.interviewproject.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class CreditCard {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonBackReference
     private User user;
 
     @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
@@ -43,6 +45,14 @@ public class CreditCard {
     public void addBalanceHistoryEntry(BalanceHistory entry){
         balanceHistory.add(entry);
         sortBalanceHistoryByDate();
+    }
+    public void updateBalanceHistory(List<UpdateBalancePayload> updates) {
+        for (UpdateBalancePayload update : updates) {
+            BalanceHistory newEntry = new BalanceHistory();
+            newEntry.setDate(update.getTransactionTime());
+            newEntry.setBalance(update.getTransactionAmount());
+            addBalanceHistoryEntry(newEntry);
+        }
     }
 
     // TODO: Credit card's owner. For detailed hint, please see User class DONE

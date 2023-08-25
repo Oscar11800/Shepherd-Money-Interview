@@ -2,19 +2,16 @@ package com.shepherdmoney.interviewproject.service;
 
 import com.shepherdmoney.interviewproject.exception.CreditCardNotFoundException;
 import com.shepherdmoney.interviewproject.exception.UserNotFoundException;
+import com.shepherdmoney.interviewproject.model.BalanceHistory;
 import com.shepherdmoney.interviewproject.model.CreditCard;
 import com.shepherdmoney.interviewproject.model.User;
 import com.shepherdmoney.interviewproject.repository.CreditCardRepository;
-import com.shepherdmoney.interviewproject.repository.UserRepository;
+import com.shepherdmoney.interviewproject.vo.request.UpdateBalancePayload;
 import com.shepherdmoney.interviewproject.vo.response.CreditCardView;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /*
@@ -42,11 +39,7 @@ public class CreditCardService {
         return creditCard.get();
     }
 
-    public List<CreditCard> getAllCreditCards() {
-        return creditCardRepo.findAll();
-    }
-
-    public List<CreditCardView> getAllCreditCardsByUserId(int userId){
+    public List<CreditCardView> getAllCreditCardsByUserId(int userId) {
         User user = userService.getUser(userId);
         List<CreditCard> creditCards = user.getCreditCards();
 
@@ -61,7 +54,7 @@ public class CreditCardService {
         return creditCardViews;
     }
 
-    public CreditCard getCreditCardByNumber(String creditCardNumber){
+    public CreditCard getCreditCardByNumber(String creditCardNumber) {
         try {
             return creditCardRepo.findCreditCardByNumber(creditCardNumber);
         } catch (Exception ex) {
@@ -69,24 +62,11 @@ public class CreditCardService {
         }
     }
 
-    public User getUserByCreditCardNumber(String creditCardNumber){
+    public User getUserByCreditCardNumber(String creditCardNumber) {
         CreditCard creditCard = getCreditCardByNumber(creditCardNumber);
         Optional<User> userOptional = Optional.ofNullable(creditCard).map(CreditCard::getUser);
 
         return userOptional.orElseThrow(() -> new UserNotFoundException("No user associated with credit card number " + creditCardNumber));
-    }
-
-    public CreditCard addCreditCard(CreditCard creditCard) {
-        return creditCardRepo.save(creditCard);
-    }
-
-    public CreditCard updateCreditCard(int id, CreditCard creditCard) {
-        Optional<CreditCard> tempCreditCard = creditCardRepo.findById(id);
-        if (tempCreditCard.isEmpty()) {
-            throw new CreditCardNotFoundException("Credit Card with id{" + id + "} not found.");
-        }
-        creditCard.setId(id);
-        return creditCardRepo.save(creditCard);
     }
 
     public CreditCard addCreditCardToUser(int userId, CreditCard creditCard) {
@@ -96,33 +76,25 @@ public class CreditCardService {
     }
 
     /*
-     * Partial record update for when we don't want to
+     * Partial credit card update for when we don't want to
      * replace all fields. This can improve performance
      * when updating entire entity is unnecessary
-     * @param id identifier of credit card to modify
-     * @param Map<String, Object> key, value pairs fed to HTTP request body to modify
      */
+    public void updateCreditCardBalances(List<UpdateBalancePayload> balanceUpdates) {
+        for (UpdateBalancePayload updatePayload : balanceUpdates) {
+            String creditCardNumber = updatePayload.getCreditCardNumber();
+            CreditCard creditCard = creditCardRepo.findCreditCardByNumber(creditCardNumber);
 
-    public CreditCard patch(int id, Map<String, Object> partialCreditCard) {
-        Optional<CreditCard> creditCard = creditCardRepo.findById(id);
-
-        /*
-        loop through Map of key-value pairs to be updated, makes desired changes
-        Using the Reflections API to modify CreditCard object during runtime
-        */
-        if (creditCard.isPresent()) {
-            partialCreditCard.forEach((key, value) -> {
-                System.out.println("Key: " + key + " Value: " + value);
-                Field field = ReflectionUtils.findField(CreditCard.class, key);
-                //allows access to private fields
-                ReflectionUtils.makeAccessible(field);
-                //sets the field in the CreditCard object
-                ReflectionUtils.setField(field, creditCard.get(), value);
-            });
-        } else {
-            throw new CreditCardNotFoundException("Credit Card with id{\" + id + \"} not found.");
+            if (creditCard != null) {
+                BalanceHistory balanceHistory = new BalanceHistory();
+                balanceHistory.setDate(updatePayload.getTransactionTime());
+                balanceHistory.setBalance(updatePayload.getTransactionAmount());
+                creditCard.getBalanceHistory().add(balanceHistory);
+                creditCardRepo.save(creditCard);
+            } else {
+                throw new CreditCardNotFoundException(
+                        "Credit Card with number{" + creditCardNumber + "} not found.");
+            }
         }
-        return creditCardRepo.save(creditCard.get());
     }
-
 }

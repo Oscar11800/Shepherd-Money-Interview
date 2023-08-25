@@ -1,5 +1,6 @@
 package com.shepherdmoney.interviewproject.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "MyUser")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-@Table(name = "MyUser")
 public class User {
 
     @Id
@@ -22,21 +23,20 @@ public class User {
     private int id;
 
     private String name;
-
     private String email;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<CreditCard> creditCards = new ArrayList<>();
 
-    //set up bidirectional relationship with CreditCard class
+    // Set up bidirectional relationship with CreditCard class
+    // A user can have one or more, or none at all.
+    // We want to be able to query credit cards by user
+    // and user by a credit card.
     public void addCreditCard(CreditCard creditCard) {
-        //adds card to user's credit cards
+        // Adds card to user's credit cards
         creditCards.add(creditCard);
-        //sets user as the owner of this card
+        // Sets user as the owner of this card
         creditCard.setUser(this);
     }
-
-    // TODO: User's credit card DONE
-    // HINT: A user can have one or more, or none at all. We want to be able to query credit cards by user
-    //       and user by a credit card.
 }
