@@ -6,10 +6,12 @@ import com.shepherdmoney.interviewproject.model.CreditCard;
 import com.shepherdmoney.interviewproject.model.User;
 import com.shepherdmoney.interviewproject.repository.CreditCardRepository;
 import com.shepherdmoney.interviewproject.repository.UserRepository;
+import com.shepherdmoney.interviewproject.vo.response.CreditCardView;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,11 +25,11 @@ import java.util.Optional;
 public class CreditCardService {
 
     private final CreditCardRepository creditCardRepo;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public CreditCardService(CreditCardRepository creditCardRepo, UserRepository userRepository) {
+    public CreditCardService(CreditCardRepository creditCardRepo, UserService userService) {
         this.creditCardRepo = creditCardRepo;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public CreditCard getCreditCard(int id) {
@@ -41,6 +43,21 @@ public class CreditCardService {
 
     public List<CreditCard> getAllCreditCards() {
         return creditCardRepo.findAll();
+    }
+
+    public List<CreditCardView> getAllCreditCardsByUserId(int userId){
+        User user = userService.getUser(userId);
+        List<CreditCard> creditCards = user.getCreditCards();
+
+        List<CreditCardView> creditCardViews = new ArrayList<>();
+        for (CreditCard creditCard : creditCards) {
+            CreditCardView creditCardView = new CreditCardView();
+            creditCardView.setIssuanceBank(creditCard.getIssuanceBank());
+            creditCardView.setNumber(creditCard.getNumber());
+            creditCardViews.add(creditCardView);
+        }
+
+        return creditCardViews;
     }
 
     public CreditCard addCreditCard(CreditCard creditCard) {
@@ -57,9 +74,7 @@ public class CreditCardService {
     }
 
     public CreditCard addCreditCardToUser(int userId, CreditCard creditCard) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found."));
-
+        User user = userService.getUser(userId);
         creditCard.setUser(user);
         return creditCardRepo.save(creditCard);
     }

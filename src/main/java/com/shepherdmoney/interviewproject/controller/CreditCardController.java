@@ -40,36 +40,26 @@ public class CreditCardController {
 
     @PostMapping("/credit-card")
     public ResponseEntity<ResponseWrapper> addCreditCardToUser(@RequestBody AddCreditCardToUserPayload payload) {
-        // TODO: Create a credit card entity, and then associate that credit card with user with given userId
-        //       Return 200 OK with the credit card id if the user exists and credit card is successfully associated with the user
-        //       Return other appropriate response code for other exception cases
-        //       Do not worry about validating the card number, assume card number could be any arbitrary format and length
-        try {
-            //create credit card entity
-            CreditCard newCreditCard = new CreditCard();
-            newCreditCard.setIssuanceBank(payload.getCardIssuanceBank());
-            newCreditCard.setNumber(payload.getCardNumber());
+        //create credit card entity
+        CreditCard newCreditCard = new CreditCard();
+        newCreditCard.setIssuanceBank(payload.getCardIssuanceBank());
+        newCreditCard.setNumber(payload.getCardNumber());
 
-            //associate card with user
-            CreditCard createdCreditCard = creditCardService.addCreditCardToUser(payload.getUserId(), newCreditCard);
-            ResponseWrapper response = new ResponseWrapper();
+        //associate card with user
+        CreditCard createdCreditCard = creditCardService.addCreditCardToUser(payload.getUserId(), newCreditCard);
+        ResponseWrapper response = new ResponseWrapper();
 
-            response.setId(createdCreditCard.getId());
+        response.setId(createdCreditCard.getId());
 
-            return ResponseEntity.ok(response);
-        } catch (UserNotFoundException ex) {
-            ResponseWrapper response = new ResponseWrapper();
-            response.setMessage("User with ID " + payload.getUserId() + " not found.");
-
-            return ResponseEntity.badRequest().body(response);
-        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/credit-card:all")
     public ResponseEntity<List<CreditCardView>> getAllCardOfUser(@RequestParam int userId) {
-        // TODO: return a list of all credit card associated with the given userId, using CreditCardView class
+        // TODO: return a list of all credit card associated with the given userId, using CreditCardView class DONE
         //       if the user has no credit card, return empty list, never return null
-        return null;
+        List<CreditCardView> creditCardViews = creditCardService.getAllCreditCardsByUserId(userId);
+        return ResponseEntity.ok(creditCardViews);
     }
 
     @GetMapping("/credit-card:user-id")
