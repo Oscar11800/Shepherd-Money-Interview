@@ -1,9 +1,11 @@
 package com.shepherdmoney.interviewproject.controller;
 
+import com.shepherdmoney.interviewproject.exceptions.UserNotFoundException;
 import com.shepherdmoney.interviewproject.model.CreditCard;
 import com.shepherdmoney.interviewproject.model.User;
 import com.shepherdmoney.interviewproject.repository.CreditCardRepository;
 import com.shepherdmoney.interviewproject.service.CreditCardService;
+import com.shepherdmoney.interviewproject.utils.ResponseWrapper;
 import com.shepherdmoney.interviewproject.vo.request.AddCreditCardToUserPayload;
 import com.shepherdmoney.interviewproject.vo.request.UpdateBalancePayload;
 import com.shepherdmoney.interviewproject.vo.response.CreditCardView;
@@ -43,12 +45,30 @@ public class CreditCardController {
     }
 
     @PostMapping("/credit-card")
-    public ResponseEntity<Integer> addCreditCardToUser(@RequestBody AddCreditCardToUserPayload payload) {
+    public ResponseEntity<ResponseWrapper> addCreditCardToUser(@RequestBody AddCreditCardToUserPayload payload) {
         // TODO: Create a credit card entity, and then associate that credit card with user with given userId
         //       Return 200 OK with the credit card id if the user exists and credit card is successfully associated with the user
         //       Return other appropriate response code for other exception cases
         //       Do not worry about validating the card number, assume card number could be any arbitrary format and length
-        return null;
+        try {
+            //create credit card entity
+            CreditCard newCreditCard = new CreditCard();
+            newCreditCard.setIssuanceBank(payload.getCardIssuanceBank());
+            newCreditCard.setNumber(payload.getCardNumber());
+
+            //associate card with user
+            CreditCard createdCreditCard = creditCardService.addCreditCardToUser(payload.getUserId(), newCreditCard);
+            ResponseWrapper response = new ResponseWrapper();
+
+            response.setId(createdCreditCard.getId());
+
+            return ResponseEntity.ok(response);
+        } catch (UserNotFoundException ex) {
+            ResponseWrapper response = new ResponseWrapper();
+            response.setMessage("User with ID " + payload.getUserId() + " not found.");
+
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @GetMapping("/credit-card:all")

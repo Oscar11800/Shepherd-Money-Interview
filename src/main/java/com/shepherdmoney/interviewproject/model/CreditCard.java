@@ -31,7 +31,8 @@ public class CreditCard {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(mappedBy = "creditCard")
+    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name="creditcard_id")
     private List<BalanceHistory> balanceHistory = new ArrayList<>();
 
 
