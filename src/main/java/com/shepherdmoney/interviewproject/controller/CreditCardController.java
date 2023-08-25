@@ -2,15 +2,19 @@ package com.shepherdmoney.interviewproject.controller;
 
 import com.shepherdmoney.interviewproject.exception.UserNotFoundException;
 import com.shepherdmoney.interviewproject.model.CreditCard;
+import com.shepherdmoney.interviewproject.model.User;
 import com.shepherdmoney.interviewproject.service.CreditCardService;
 import com.shepherdmoney.interviewproject.utils.ResponseWrapper;
 import com.shepherdmoney.interviewproject.vo.request.AddCreditCardToUserPayload;
 import com.shepherdmoney.interviewproject.vo.request.UpdateBalancePayload;
 import com.shepherdmoney.interviewproject.vo.response.CreditCardView;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,20 +60,25 @@ public class CreditCardController {
 
     @GetMapping("/credit-card:all")
     public ResponseEntity<List<CreditCardView>> getAllCardOfUser(@RequestParam int userId) {
-        // TODO: return a list of all credit card associated with the given userId, using CreditCardView class DONE
-        //       if the user has no credit card, return empty list, never return null
         List<CreditCardView> creditCardViews = creditCardService.getAllCreditCardsByUserId(userId);
         return ResponseEntity.ok(creditCardViews);
     }
 
     @GetMapping("/credit-card:user-id")
     public ResponseEntity<Integer> getUserIdForCreditCard(@RequestParam String creditCardNumber) {
-        // TODO: Given a credit card number, efficiently find whether there is a user associated with the credit card
+        // TODO: Given a credit card number, efficiently find whether there is a user associated with the credit card DONE
         //       If so, return the user id in a 200 OK response. If no such user exists, return 400 Bad Request
-        return null;
+
+        User associatedUser = creditCardService.getUserByCreditCardNumber(creditCardNumber);
+        return ResponseEntity.ok(associatedUser.getId());
     }
 
-    @PostMapping("/credit-card:update-balance")
+    /*
+     * I changed this to a PatchMapping because only one field needs to be updated.
+     * By partially updating instead of replacing the entire record
+     * it can positively improve performance.
+     */
+    @PatchMapping("/credit-card:update-balance")
     public ResponseEntity<Integer> postMethodName(@RequestBody UpdateBalancePayload[] payload) {
         //TODO: Given a list of transactions, update credit cards' balance history.
         //      For example: if today is 4/12, a credit card's balanceHistory is [{date: 4/12, balance: 110}, {date: 4/10, balance: 100}],
@@ -78,7 +87,16 @@ public class CreditCardController {
         //      Return 200 OK if update is done and successful, 400 Bad Request if the given card number
         //        is not associated with a card.
 
-        return null;
+        for (UpdateBalancePayload transaction : payload) {
+            String creditCardNumber = transaction.getCreditCardNumber();
+            CreditCard creditCard = creditCardService.getCreditCardByNumber(creditCardNumber);
+            creditCardService.patch(creditCard.getId(), Map.of("balanceHistory", new UpdateBalancePayload[]{transaction}));
+        }
+        return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/credit-card/{cardId}")
+    public ResponseEntity<CreditCard> getCreditCard(@PathVariable int cardId){
+        return new ResponseEntity<>(creditCardService.getCreditCard(cardId), HttpStatus.OK);
+    }
 }

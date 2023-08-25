@@ -7,6 +7,7 @@ import com.shepherdmoney.interviewproject.model.User;
 import com.shepherdmoney.interviewproject.repository.CreditCardRepository;
 import com.shepherdmoney.interviewproject.repository.UserRepository;
 import com.shepherdmoney.interviewproject.vo.response.CreditCardView;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
@@ -58,6 +59,21 @@ public class CreditCardService {
         }
 
         return creditCardViews;
+    }
+
+    public CreditCard getCreditCardByNumber(String creditCardNumber){
+        try {
+            return creditCardRepo.findCreditCardByNumber(creditCardNumber);
+        } catch (Exception ex) {
+            throw new CreditCardNotFoundException("Credit card with number " + creditCardNumber + " not found.");
+        }
+    }
+
+    public User getUserByCreditCardNumber(String creditCardNumber){
+        CreditCard creditCard = getCreditCardByNumber(creditCardNumber);
+        Optional<User> userOptional = Optional.ofNullable(creditCard).map(CreditCard::getUser);
+
+        return userOptional.orElseThrow(() -> new UserNotFoundException("No user associated with credit card number " + creditCardNumber));
     }
 
     public CreditCard addCreditCard(CreditCard creditCard) {
