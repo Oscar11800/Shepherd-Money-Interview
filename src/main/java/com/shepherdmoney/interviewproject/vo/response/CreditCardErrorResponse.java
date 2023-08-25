@@ -12,6 +12,7 @@ public class CreditCardErrorResponse {
     private int statusCode;
     private String path;
     private String message;
+
     public CreditCardErrorResponse(ZonedDateTime timeStamp, int statusCode, String path, String message) {
         this.timeStamp = timeStamp;
         this.statusCode = statusCode;

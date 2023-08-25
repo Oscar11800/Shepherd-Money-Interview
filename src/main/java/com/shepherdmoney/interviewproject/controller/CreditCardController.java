@@ -16,24 +16,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /*
-* Assumptions about the relationship between credit card and user:
-*  - They have a one-to-many relationship because one user
-* can have more than one credit card, but a credit card cannot have more
-* than one user (there may be joint/authorized users, but that is not
-* being considered in this application).
-*
-* - They have a bidirectional relationship because we should be able
-* to access credit cards given a user id, and a user given
-* a credit card number.
-*
-* - Every credit card must be associated with a user, and when we
-* delete a user, the associated credit cards should be deleted but
-* not vice versa
-* */
+ * Assumptions about the relationship between credit card and user:
+ *  - They have a one-to-many relationship because one user
+ * can have more than one credit card, but a credit card cannot have more
+ * than one user (there may be joint/authorized users, but that is not
+ * being considered in this application).
+ *
+ * - They have a bidirectional relationship because we should be able
+ * to access credit cards given a user id, and a user given
+ * a credit card number.
+ *
+ * - Every credit card must be associated with a user, and when we
+ * delete a user, the associated credit cards should be deleted but
+ * not vice versa
+ * */
 @RestController
 public class CreditCardController {
-
-    // TODO: wire in CreditCard repository here (~1 line) DONE
     final CreditCardService creditCardService;
 
     public CreditCardController(CreditCardService creditCardService) {
@@ -89,8 +87,8 @@ public class CreditCardController {
         //      [{date: 4/12, balance: 120}, {date: 4/11, balance: 110}, {date: 4/10, balance: 110}]
         //      Return 200 OK if update is done and successful, 400 Bad Request if the given card number
         //        is not associated with a card.
-        
+
         return null;
     }
-    
+
 }

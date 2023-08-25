@@ -13,10 +13,10 @@ import java.util.Optional;
 public class UserService {
     final UserRepository userRepo;
 
-/*
-    constructor dependency injection for guaranteeing
-    immutability of the state of the bean after creation
-*/
+    /*
+        constructor dependency injection for guaranteeing
+        immutability of the state of the bean after creation
+    */
     public UserService(UserRepository userRepo) {
         this.userRepo = userRepo;
     }
@@ -29,19 +29,19 @@ public class UserService {
         return user.get();
     }
 
-    public User assignCreditCard(int id, CreditCard creditCard){
+    public User assignCreditCard(int id, CreditCard creditCard) {
         User user = getUser(id);
         user.addCreditCard(creditCard);
         return userRepo.save(user);
     }
 
-    public User createUser(User user){
+    public User createUser(User user) {
         return userRepo.save(user);
     }
 
-    public void deleteUser(int id){
+    public void deleteUser(int id) {
         Optional<User> user = userRepo.findById(id);
-        if(user.isEmpty()){
+        if (user.isEmpty()) {
             throw new UserNotFoundException("User with id{ " + id + " } is not found.");
         }
         userRepo.delete(user.get());

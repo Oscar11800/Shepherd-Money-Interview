@@ -9,11 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
+
 /*
-* I decided to return Response entities instead of POJOs
-* to maintain more control over HTTP requests in case we want to
-* provide additional metadata in the future.
-*/
+ * I decided to return Response entities instead of POJOs
+ * to maintain more control over HTTP requests in case we want to
+ * provide additional metadata in the future.
+ */
 @RestController
 public class UserController {
 

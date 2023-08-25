@@ -1,4 +1,5 @@
 package com.shepherdmoney.interviewproject.exception;
+
 /**
  * Custom exception class to represent the scenario when a user is not found.
  */

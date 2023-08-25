@@ -12,6 +12,7 @@ public class GenericErrorResponse {
     private int statusCode;
     private String path;
     private String message;
+
     public GenericErrorResponse(ZonedDateTime timeStamp, int statusCode, String path, String message) {
         this.timeStamp = timeStamp;
         this.statusCode = statusCode;

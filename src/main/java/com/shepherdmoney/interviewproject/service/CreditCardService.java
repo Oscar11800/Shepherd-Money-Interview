@@ -65,11 +65,11 @@ public class CreditCardService {
     }
 
     /*
-    * Partial record update for when we don't want to
-    * replace all fields. This can improve performance
-    * when updating entire entity is unnecessary
-    * @param id identifier of credit card to modify
-    * @param Map<String, Object> key, value pairs fed to HTTP request body to modify
+     * Partial record update for when we don't want to
+     * replace all fields. This can improve performance
+     * when updating entire entity is unnecessary
+     * @param id identifier of credit card to modify
+     * @param Map<String, Object> key, value pairs fed to HTTP request body to modify
      */
 
     public CreditCard patch(int id, Map<String, Object> partialCreditCard) {

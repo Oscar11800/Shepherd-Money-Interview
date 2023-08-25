@@ -29,7 +29,7 @@ public class User {
     private List<CreditCard> creditCards = new ArrayList<>();
 
     //set up bidirectional relationship with CreditCard class
-    public void addCreditCard(CreditCard creditCard){
+    public void addCreditCard(CreditCard creditCard) {
         //adds card to user's credit cards
         creditCards.add(creditCard);
         //sets user as the owner of this card

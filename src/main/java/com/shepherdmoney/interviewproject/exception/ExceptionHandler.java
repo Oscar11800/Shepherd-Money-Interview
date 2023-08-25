@@ -42,7 +42,7 @@ public class ExceptionHandler {
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler
-    public ResponseEntity<Object> handleGenericException(Exception exception, HttpServletRequest req){
+    public ResponseEntity<Object> handleGenericException(Exception exception, HttpServletRequest req) {
         GenericErrorResponse error = new GenericErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),

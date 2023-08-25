@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Entity
@@ -35,6 +37,13 @@ public class CreditCard {
     @JoinColumn(name="creditcard_id")
     private List<BalanceHistory> balanceHistory = new ArrayList<>();
 
+    public void sortBalanceHistoryByDate(){
+        Collections.sort(balanceHistory, Comparator.comparing(BalanceHistory::getDate).reversed());
+    }
+    public void addBalanceHistoryEntry(BalanceHistory entry){
+        balanceHistory.add(entry);
+        sortBalanceHistoryByDate();
+    }
 
     // TODO: Credit card's owner. For detailed hint, please see User class DONE
 

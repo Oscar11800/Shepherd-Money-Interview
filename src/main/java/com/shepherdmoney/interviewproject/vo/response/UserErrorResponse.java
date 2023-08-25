@@ -6,10 +6,10 @@ import lombok.Getter;
 import java.time.ZonedDateTime;
 
 /*
-* Note: while these detailed error responses are informative and helpful
-* for development, it may not be feasible for production and may
-* be a security concern when users receive it.
-* */
+ * Note: while these detailed error responses are informative and helpful
+ * for development, it may not be feasible for production and may
+ * be a security concern when users receive it.
+ * */
 @Getter
 public class UserErrorResponse {
     @JsonFormat
@@ -17,6 +17,7 @@ public class UserErrorResponse {
     private int statusCode;
     private String path;
     private String message;
+
     public UserErrorResponse(ZonedDateTime timeStamp, int statusCode, String path, String message) {
         this.timeStamp = timeStamp;
         this.statusCode = statusCode;
