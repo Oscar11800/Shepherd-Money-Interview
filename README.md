@@ -1,42 +1,41 @@
-# Shepherd Money Interview Project
+# Project Overview
 
-## Introduction
+This project is built with Java, Spring Boot, RESTful API design, database interactions, exception handling, and software architecture. The application provides functionalities to manage credit card information, users, and their associated transactions. Below is a breakdown of the key components and features of the project.
 
-Thanks for your interest in applying to Shepherd Money! Complete this short toy project before your interview to help us evaluate your skills as a software engineer. It shouldn't take more than an hour if you know Spring Boot. We look forward to seeing your work and learning more about you!
+## Components
 
-## Submission
-Create a public repository on Github or Gitlab with the code committed to the `main` branch. Send the repository link to bofanxu@shepherdmoney.com
+### 1. CreditCardController
 
-## Testing and What We Are Looking For
-Feel free to test your solution with your own inputs as we don't provide local test cases. To run the project, use the code below. JDK 17 is required, so make sure it's installed on your computer. If you're using Debian Linux, you can install it with `sudo apt install openjdk-17-jdk`.
+This controller handles various endpoints related to credit card management. It allows users to add credit cards, retrieve all cards associated with a user, retrieve the user ID for a credit card number, update balance history, and retrieve credit card details by card number.
 
-```bash
-./gradlew bootRun
-```
+### 2. UserController
 
-We will test your solution by calling the APIs directly. While correctness is important, we are more interested in how you designed the API and your coding practices, such as using clear variable names, good comments, and good naming conventions.
+The UserController manages user-related endpoints. It enables the creation of new users, deletion of users, and retrieval of user details by their ID.
 
-## Project Summary
-Write a Spring Boot program that manages user creation/deletion and adding credit cards to their profiles. Users may have zero or more credit cards associated with them. Also, create two APIs: one to get all credit cards for a user and another to find a user by their credit card number.
+### 3. Exception Handling
 
-## Files to Change
-Any files with content marked with **TODO** will contains hints on what to add. You are welcomed to add/modify any files to help to implement this project.
+The custom exception classes, such as CreditCardNotFoundException and UserNotFoundException, ensure proper error handling and response generation. The ExceptionHandler class centralizes exception handling and converts them into consistent error responses.
 
-## Models
-Following is a component overview of the models. You can find more hints in the source code files as well
-- `User`: each user has their name, date of birth, and some (or none) credit cards associated with them
-- `CreditCard`: each credit card has issance bank, card number, who the card belongs to, and a list of balance history
-- `BalanceHistory`: credit card balance for a specific date.
+### 4. Repositories
 
-## Controllers
-The controllers should contain enough comment for you to implement their basic functionalities. Note that apart from implementing the simple functionalities, we are looking for good coding conventions, good error handling, etc.
+The repositories, CreditCardRepository and UserRepository, manage data persistence and interactions with the database.
 
-## Useful Tools
-- **PostMan**: useful to send http requests to test your API
-- **H2 Console**: when running your project, you can use `http://localhost:8080/h2-ui` to access the h2 console. This will allow to look at what's stored in the database.
-  - The database name is `database`
-  - The username is `sa`
-  - The password is `password`
+### 5. Services
 
-## Questions?
-If you have project related issues, feel free to raise an issue on the repository :D. If you have more private questions, please reach out to bofanxu@shepherdmoney.com
+The CreditCardService and UserService classes handle business logic, separating it from the controllers. They manage user and credit card operations, user-card relationships, transaction updates, and more.
+
+### 6. Payloads
+
+The project includes various payload classes, such as AddCreditCardToUserPayload and UpdateBalancePayload, used to structure incoming request data.
+
+### 7. Utilities
+
+The ResponseWrapper class encapsulates API responses, providing a unified format for conveying operation outcomes.
+
+## Features
+
+- Adding credit cards to users, mimicking the one-to-many relationship between them.
+- Retrieving all credit cards owned by a user.
+- Associating a user with a credit card number and vice versa.
+- Partially updating credit card balance history, enhancing performance.
+- Retrieving credit card details by card
